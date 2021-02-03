@@ -13,88 +13,89 @@
 
 // Put your code here.
 
+// Peseudo code:
+
+// addr = SCREEN
+// n = MaxSCREEN
+// i = 0
+// (LOOP)
+//    if KBD == 0: value = 0
+//    else: value = -1
+//    if i > n goto RESET
+//    RAM[addr] = value
+//    addr += 1
+//    i += 1
+//    goto LOOP
+// (RESET)
+//    i = 0
+//    addr = SCREEN
+//    goto LOOp
+
 @SCREEN
 D=A
-@addr1 // addr1 = 16384
-M=D
-@addr2 // addr2 = 16384
+@addr
+M=D  // addr = 16384
+
+@8191  // 8K Screen Map 
+D=A
+@n
 M=D
 
-@8191 // MAX SCREEN
-D=A 
-@max
-M=D
-
-@i1
-M=0
-@i2
+@i
 M=0
 (LOOP)
     @KBD
     D=M
-    @CLEAR
-    D;JEQ  // if RAM[KBD] == 0 goto CLEAR
+    @V1
+    D;JEQ  // if KBD == 0 goto V1
 
-    @FILL
-    0;JMP  // if RAM[KBD] > 0 goto FILL
+    @V2
+    D;JMP  // if KBD > 0 goto V2
 
-(FILL)
-    @i1
+(V1)
+    @R0
+    D=A
+    @value
+    M=D  // if KBD == 0 then value = 0
+    @MAIN
+    0;JMP
+(V2)
+    @R1
+    M=-1
+    @R1
     D=M
-    @max
-    D=D-M
-    @RESET1
-    D;JGT  // if i1 > max goto RESET1
+    @value
+    M=D  // value = -1
+    @MAIN
+    0;JMP 
 
-    @addr1
-    A=M
-    M=-1  // RAM[addr1] = -1
-
-    @addr1  // addr1 = addr1 + 1
-    M=M+1
-    @i1
-    M=M+1
-    @LOOP
-    0;JMP  // goto LOOP
-
-
-(CLEAR)
-    @i2
-    D=M
-    @max
-    D=D-M
-    @RESET2
-    D;JGT  // if i1 > max goto RESET2
-
-    @addr2
-    A=M
-    M=0  // RAM[addr1] = 0
-
-    @addr2  // addr2 = addr2+ 1
-    M=M+1
-    @i2
-    M=M+1
-    @LOOP
-    0;JMP  // goto LOOP
-
-(RESET1)
+(RESET)
     @SCREEN
     D=A
-    @addr1  // reset addr1
-    M=D
-
-    @i1
-    M=0  // reset i1
+    @addr
+    M=D  // reset addr
+    @i
+    M=0  // reset i
     @LOOP
     0;JMP
- 
-(RESET2)
-    @SCREEN
-    D=A
-    @addr2
-    M=D
 
-    @i2
-    M=0
+(MAIN)
+    @i
+    D=M
+    @n
+    D=D-M
+    @RESET
+    D;JGT  // if i > n goto RESET
+
+    @value
+    D=M
+    @addr
+    A=M
+    M=D  // RAM[addr] = value(0, -1)
+
+    @i
+    M=M+1
+    @addr
+    M=M+1  // addr = addr + 1
     @LOOP
-    0;JMP 
+    0;JMP
